@@ -86,4 +86,54 @@ const removeProduct = async(req, res) => {
 
 }
 
-export {listProduct, addProduct, removeProduct, singleProduct}
+const updateProduct = async(req, res) => {
+    try {
+        const { id, name, description, price, category, subCategory, sizes, bestSeller } = req.body;
+
+        if (!id) {
+            return res.json({ success: false, message: "Vui lòng cung cấp ID sản phẩm cần sửa" });
+        }
+
+        // Tạo một object rỗng để chứa dữ liệu cần update
+        let updateData = {};
+
+        // Chỉ đưa vào object những trường có giá trị (không bị undefined)
+        if (name) updateData.name = name;
+        if (description) updateData.description = description;
+        if (category) updateData.category = category;
+        if (subCategory) updateData.subCategory = subCategory;
+        
+        if (price) updateData.price = Number(price);
+        
+        // Xử lý bestSeller (kiểm tra chuẩn xác cả dạng chuỗi và boolean)
+        if (bestSeller !== undefined) {
+            updateData.bestSeller = bestSeller === "true" || bestSeller === true;
+        }
+
+        // Xử lý parse mảng sizes an toàn
+        if (sizes) {
+            try {
+                updateData.sizes = typeof sizes === 'string' ? JSON.parse(sizes) : sizes;
+            } catch (err) {
+                return res.json({ success: false, message: "Định dạng sizes không hợp lệ." });
+            }
+        }
+
+        // Thực hiện update
+        const updatedProduct = await Product.findByIdAndUpdate(
+            id, 
+            updateData, 
+            { new: true } // Trả về data mới sau khi cập nhật
+        );
+
+        if (!updatedProduct) return res.json({ success: false, message: "Không tìm thấy sản phẩm" });
+        
+        res.json({ success: true, message: "Cập nhật thành công", product: updatedProduct });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+        console.error("Error in updateProduct", error);
+    }
+}
+
+export {listProduct, addProduct, removeProduct, singleProduct, updateProduct}
