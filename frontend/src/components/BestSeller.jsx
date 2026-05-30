@@ -12,11 +12,11 @@ const BestSeller = () => {
         // console.log("Du lieu ban dau", products)
         // Đảm bảo products có tồn tại và là mảng trước khi filter
         if (products && products.length > 0) {
-            const bestProduct = products.filter((item) => item.bestseller);
+            const bestProduct = products.filter((item) => item.bestSeller);
             // console.log("du lieu sau", bestProduct);
             setBestSeller(bestProduct.slice(0, 5));
         }
-    }, [])
+    }, [products])
 
   return (
     <div className='my-10'>
