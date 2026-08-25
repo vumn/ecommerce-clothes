@@ -24,7 +24,7 @@ const placeOrder = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.json({success: false, messae: error.message})
+        res.json({success: false, message: error.message})
         
     }
 }
@@ -46,7 +46,15 @@ const allOrders = async (req, res) => {
 
 // User Order Data for frontend
 const userOrders = async (req, res) => {
-    
+    try {
+        const {userId} = req.body;
+
+        const orders = await Order.find({ userId })
+        res.json({success:true, orders})
+    } catch (error) {
+        console.log(error);
+        res.json({success:false, message: error.message})
+    }
 } 
 
 // update order status from admin panel
