@@ -1,4 +1,4 @@
-import { currency } from '../../admin/src/App.jsx'
+
 import Order from '../models/Order.js'
 import User from '../models/User.js'
 import Stripe from 'stripe'
@@ -86,7 +86,26 @@ const placeOrderStripe = async (req, res) => {
         })
 
         res.json({success:true, session_url:session.url})
-        
+
+    } catch (error) {
+        console.log(error);
+        res.json({success: false, message: error.message})
+    }
+}
+
+//  Verify Stripe
+const verifyStripe = async (req, res) => {
+    const {orderId, success, userId} = req.body;
+    try {
+        if (success === "true") {
+            await Order.findByIdAndUpdate(orderId, {payment: true});
+            await User.findByIdAndUpdate(userId, {cartData: {}})
+            res.json({success: true})
+        }
+        else {
+            await Order.findByIdAndDelete(orderId)
+            res.json({success:false})
+        }
     } catch (error) {
         console.log(error);
         res.json({success: false, message: error.message})
@@ -134,4 +153,4 @@ const updateStatus = async (req, res) => {
     }
 } 
 
-export {placeOrder, placeOrderRazorpay, placeOrderStripe, allOrders, userOrders, updateStatus}
+export {verifyStripe, placeOrder, placeOrderRazorpay, placeOrderStripe, allOrders, userOrders, updateStatus}
